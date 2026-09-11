@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usman Sabir — Digital Marketing &amp; SEO Specialist</title>
+  <meta name="description" content="Usman Sabir — Digital Marketing & SEO Specialist. On-page & off-page SEO, technical SEO, link building and content strategy for international clients." />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style/main.css" />
+</head>
+<body>
+  <div id="grain"></div>
+  <div id="progress-bar"></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <header id="site-header">
+    <a href="#hero" class="brand">Usman<span>.</span></a>
+    <nav id="site-nav">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a href="#contact" class="btn btn-small header-cta">Let's talk</a>
+    <button id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </header>
+
+  <!-- Persistent 3D character. Lives in the hero at load, then docks into a
+       floating corner widget once the visitor scrolls past the hero. -->
+  <div id="character-stage" aria-hidden="true">
+    <canvas id="character-canvas"></canvas>
+  </div>
+
+  <main>
+    <section id="hero">
+      <div class="hero-inner">
+        <p class="hero-greeting" data-reveal>Hey, there</p>
+        <h1 id="hero-title"><span id="hero-typewriter"></span><span class="typewriter-cursor" aria-hidden="true"></span></h1>
+        <p class="eyebrow" data-reveal>Digital Marketing &amp; SEO Specialist</p>
+        <p class="hero-sub" data-reveal>
+          I grow organic traffic and search rankings for brands that want to be found —
+          on-page, off-page, and everything technical in between.
+        </p>
+        <div class="hero-actions" data-reveal>
+          <a href="#projects" class="btn btn-primary">See my work</a>
+          <a href="#contact" class="btn btn-ghost">Hire me</a>
+        </div>
+      </div>
+      <div class="hero-photo-wrap" data-reveal>
+        <img class="hero-photo" src="/portrait.jpg" alt="Usman Sabir" />
+      </div>
+      <div class="scroll-cue"><span></span>Scroll</div>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track" id="marquee-track"></div>
+      </div>
+    </section>
+
+    <section id="about" data-num="01">
+      <div class="section-head">
+        <p class="section-kicker">About</p>
+        <h2 data-reveal>Results-driven, data-led, and hands-on with every client's ranking curve.</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-copy">
+          <p class="about-summary" data-reveal></p>
+          <div class="about-highlights" id="about-highlights"></div>
+        </div>
+        <ul class="about-achievements" data-reveal></ul>
+      </div>
+      <div class="stat-row" id="stat-row"></div>
+    </section>
+
+    <section id="experience" data-num="02">
+      <div class="section-head">
+        <p class="section-kicker">Experience</p>
+        <h2 data-reveal>Where I've put SEO strategy into practice.</h2>
+      </div>
+      <div class="timeline" id="experience-list"></div>
+    </section>
+
+    <section id="projects" data-num="03">
+      <div class="section-head">
+        <p class="section-kicker">Projects</p>
+        <h2 data-reveal>A few wins I can point to.</h2>
+      </div>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
+
+    <section id="skills" data-num="04">
+      <div class="section-head">
+        <p class="section-kicker">Skills</p>
+        <h2 data-reveal>The toolkit behind the rankings.</h2>
+      </div>
+      <div class="skills-grid" id="skills-grid"></div>
+    </section>
+
+    <section id="contact" data-num="05">
+      <div class="section-head">
+        <p class="section-kicker">Contact</p>
+        <h2 class="cta-heading" data-reveal>Let's make your <span class="outline-text">rankings</span> undeniable.</h2>
+        <p class="section-sub" data-reveal>Have a website that should rank higher? Tell me about it — I reply fast.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-links" id="contact-links"></div>
+        <form id="contact-form" class="contact-form">
+          <input type="text" name="name" placeholder="Your name" required />
+          <input type="email" name="email" placeholder="Your email" required />
+          <textarea name="message" rows="4" placeholder="What are you looking to improve?" required></textarea>
+          <button type="submit" class="btn btn-primary">Send message</button>
+          <p class="form-note">Opens your email client — nothing is stored on this site.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer">
+    <p>© <span id="year"></span> Usman Sabir. All rights reserved.</p>
+  </footer>
+
+  <!-- Chat "bubble": not a boxed chat-app widget — a speech bubble that
+       hangs off the avatar itself and speaks first. Talks to /api/chat. -->
+  <div id="chat-panel" class="chat-panel" hidden>
+    <button id="chat-close" class="chat-close" aria-label="Close chat">✕</button>
+    <div class="chat-nametag"><span class="chat-dot" id="chat-dot"></span>Usman</div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-suggestions" id="chat-suggestions"></div>
+    <form id="chat-form" class="chat-form">
+      <input id="chat-input" type="text" placeholder="Say something…" autocomplete="off" maxlength="500" />
+      <button type="submit" aria-label="Send">➤</button>
+    </form>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

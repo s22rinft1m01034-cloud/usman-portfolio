@@ -1,0 +1,554 @@
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+:root {
+  /* Warm cream/light — full pivot from the earlier dark theme, per explicit
+     user request to match a light, photo-led personal-portfolio reference. */
+  --bg: #f7f2ea;
+  --bg-rgb: 247, 242, 234;
+  --bg-elev: #ffffff;
+  --bg-elev-2: #efe7d8;
+  --line: rgba(28, 23, 18, 0.1);
+  --text: #1c1712;
+  --text-dim: #6b6155;
+  --text-faint: #9a8f80;
+  /* Green kept as the established accent (fought for twice earlier this
+     session) but re-tuned muted/forest rather than neon-bright, since a
+     saturated bright green reads as too loud against a soft cream bg. Gold
+     secondary similarly deepened. */
+  --accent: #3d7a52;
+  --accent-rgb: 61, 122, 82;
+  --accent-strong: #2a5a3a; /* gradient end for buttons — a shade darker than --accent */
+  --accent-soft: rgba(var(--accent-rgb), 0.12);
+  --accent-2: #c17f2e;
+  --accent-2-rgb: 193, 127, 46;
+
+  /* The hero used to be pinned permanently dark (independent of a light/dark
+     toggle, and later independent of the dark-only site) because the WebGL
+     scene behind it needed a dark backdrop. That scene is gone in the light
+     redesign, so these now just equal the main tokens — kept as separate
+     names only because a number of hero-scoped rules already reference them
+     by name; not worth mechanically reverting every `var(--hero-x)`. */
+  --hero-bg: #f7f2ea;
+  --hero-text: #1c1712;
+  --hero-text-rgb: 28, 23, 18;
+  --hero-text-dim: #6b6155;
+  --hero-text-faint: #9a8f80;
+  --hero-accent: #3d7a52;
+  --hero-accent-rgb: 61, 122, 82;
+
+  --font-head: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Space Mono', 'SF Mono', 'Courier New', monospace;
+  --font-accent: 'Fraunces', Georgia, serif;
+  --container: 1160px;
+  --radius: 18px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: auto; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+  font-family: var(--font-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 { font-family: var(--font-head); font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+img { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; }
+::selection { background: var(--accent); color: #06110d; }
+
+#grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 3;
+  opacity: 0.035; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  z-index: 60; transition: width 0.1s linear;
+}
+
+/* Custom cursor — only enabled (via .has-custom-cursor on <html>, set from
+   JS after feature-detecting a fine pointer) on desktop with a mouse. */
+#cursor-dot, #cursor-ring {
+  position: fixed; top: 0; left: 0; pointer-events: none; z-index: 999;
+  border-radius: 50%; transform: translate(-50%, -50%); opacity: 0;
+  transition: opacity 0.3s ease, width 0.25s cubic-bezier(0.16,1,0.3,1), height 0.25s cubic-bezier(0.16,1,0.3,1), border-color 0.25s ease, background 0.25s ease;
+}
+#cursor-dot { width: 6px; height: 6px; background: var(--accent); }
+#cursor-ring { width: 32px; height: 32px; border: 1px solid rgba(var(--accent-rgb), 0.45); }
+html.has-custom-cursor #cursor-dot, html.has-custom-cursor #cursor-ring { opacity: 1; }
+html.has-custom-cursor, html.has-custom-cursor a, html.has-custom-cursor button { cursor: none !important; }
+#cursor-ring.hover { width: 56px; height: 56px; border-color: var(--accent); background: var(--accent-soft); }
+
+.section-kicker {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  margin: 0 0 0.75rem;
+}
+
+.section-head { max-width: 720px; margin: 0 auto 3rem; text-align: left; }
+.section-head h2 {
+  font-weight: 700; letter-spacing: -0.01em;
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem); line-height: 1.3;
+  background: linear-gradient(180deg, var(--text) 0%, var(--text) 45%, rgba(var(--accent-rgb), 0.9) 160%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.35), 2px 2px 0 rgba(0,0,0,0.28), 3px 3px 6px rgba(0,0,0,0.3);
+}
+/* The Contact section closes the page with a bigger, bolder statement than
+   the other section headers — a second "hero moment" instead of a plain
+   heading. */
+#contact .section-head { max-width: 900px; }
+.section-head h2.cta-heading { font-size: clamp(2.1rem, 5vw, 3.6rem); line-height: 1.15; }
+/* One word rendered as an outline instead of filled — a bold accent moment,
+   not a gradient fill (so it needs its own reset: background isn't
+   inherited, but the parent's transparent fill-color and gradient would
+   otherwise still show through without this). */
+.outline-text {
+  background: none; -webkit-background-clip: initial; background-clip: initial;
+  color: transparent; -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px var(--accent);
+}
+.section-sub { color: var(--text-dim); margin-top: 0.75rem; }
+
+section { max-width: var(--container); margin: 0 auto; padding: 7rem 1.5rem; position: relative; z-index: 0; }
+
+/* Large faint section numerals — an editorial-portfolio touch. Uses ::after
+   (not ::before) since About/Projects/Contact already use ::before for the
+   aurora glow blobs. */
+section[data-num]::after {
+  content: attr(data-num);
+  position: absolute; top: 0.25rem; right: 1.5rem;
+  font-family: var(--font-head); font-weight: 700;
+  font-size: clamp(4rem, 10vw, 8rem);
+  color: transparent; -webkit-text-stroke: 1px var(--line);
+  line-height: 1; z-index: -1; pointer-events: none; user-select: none;
+}
+
+/* Skills marquee — pinned to the bottom of the hero itself (not a divider
+   between hero and About anymore) so it's visible in the first screenful,
+   no scrolling needed. Translucent + blurred edge fades, tied to --bg-rgb
+   (not a hardcoded literal — a hardcoded dark rgb sat here through the last
+   two rebrands as dead-wrong leftovers before being caught). */
+.marquee {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; overflow: hidden;
+  border-top: 1px solid var(--line);
+  background: linear-gradient(to top, rgba(var(--bg-rgb), 0.92), rgba(var(--bg-rgb), 0.55) 75%, transparent);
+  backdrop-filter: blur(3px);
+  padding: 1.1rem 0 1rem;
+}
+.marquee::before, .marquee::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 1; pointer-events: none;
+}
+.marquee::before { left: 0; background: linear-gradient(90deg, rgba(var(--bg-rgb),0.85), transparent); }
+.marquee::after { right: 0; background: linear-gradient(-90deg, rgba(var(--bg-rgb),0.85), transparent); }
+.marquee-track { display: flex; width: max-content; gap: 3rem; animation: marquee-scroll 32s linear infinite; }
+.marquee-item {
+  font-family: var(--font-mono); font-size: 0.85rem; color: var(--hero-text-dim);
+  white-space: nowrap; display: flex; align-items: center; gap: 0.85rem;
+}
+.marquee-item::after { content: '✦'; color: var(--hero-accent); font-size: 0.65rem; }
+@keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Soft aurora glows behind key sections — the "premium SaaS" depth cue.
+   Pure CSS, sits behind content (z-index -1), ignored for reduced motion. */
+#about, #projects, #contact { overflow: clip; }
+#about::before, #projects::before, #contact::before {
+  content: ''; position: absolute; z-index: -1; pointer-events: none;
+  width: 640px; height: 640px; border-radius: 50%; filter: blur(120px);
+  opacity: 0.16;
+}
+#about::before { top: -220px; right: -180px; background: var(--accent); }
+#projects::before { top: 10%; left: -220px; background: var(--accent-2); opacity: 0.1; }
+#contact::before { bottom: -260px; right: -200px; background: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.85rem 1.6rem; border-radius: 999px; font-weight: 600; font-size: 0.95rem;
+  border: 1px solid transparent; transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #06110d;
+  box-shadow: 0 8px 24px -8px rgba(var(--accent-rgb), 0.55);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -8px rgba(var(--accent-rgb), 0.7); }
+.btn-ghost { border-color: var(--line); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+.btn-small { padding: 0.55rem 1.15rem; font-size: 0.85rem; }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+#site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; gap: 2rem;
+  padding: 1.1rem 2rem;
+  background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0.85), transparent);
+  color: var(--text);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent) 1;
+}
+.brand { font-family: var(--font-head); font-weight: 700; font-size: 1.15rem; }
+.brand span { color: var(--accent); }
+#site-nav { display: flex; gap: 1.6rem; margin-right: auto; margin-left: 1rem; }
+#site-nav a { color: var(--text-dim); font-size: 0.92rem; transition: color 0.2s; }
+#site-nav a:hover { color: var(--text); }
+.header-cta { margin-left: auto; }
+#nav-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; padding: 8px; }
+#nav-toggle span { width: 20px; height: 2px; background: var(--text); display: block; }
+
+/* ==========================================================================
+   Character stage (3D avatar — hero-sized, docks to a corner on scroll)
+   left/top/width/height are set continuously in JS (src/three/dock.js),
+   scrubbed 1:1 with scroll position, so it shrinks and slides *with* the
+   scroll instead of snapping between two fixed states. CSS here only owns
+   the non-geometric "chrome" that toggles once docked.
+   ========================================================================== */
+#character-stage {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+}
+#character-canvas { width: 100%; height: 100%; display: block; transition: border-radius 0.3s ease, background 0.3s ease, box-shadow 0.3s ease; }
+#character-stage.docked {
+  pointer-events: auto;
+  cursor: pointer;
+}
+#character-stage.docked #character-canvas {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--bg-elev-2), var(--bg));
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(var(--accent-rgb),0.08);
+}
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+/* The hero always renders on the fixed --hero-* tokens, not the theme
+   tokens — it stays a dark, dramatic band regardless of the light/dark
+   toggle (see the token comment at the top of this file). */
+#hero {
+  position: relative; min-height: 100vh; max-width: none;
+  display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: 3vw;
+  padding: 9rem 6vw 7rem; overflow: hidden;
+  background: var(--hero-bg);
+}
+.hero-inner { position: relative; z-index: 1; max-width: 600px; }
+.hero-greeting {
+  font-family: var(--font-accent); font-style: italic; font-weight: 500;
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem); color: var(--accent); margin-bottom: 0.4rem;
+}
+.eyebrow { color: var(--hero-accent); font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.85rem; margin: 0.6rem 0 1.3rem; }
+#hero-title {
+  font-weight: 700; letter-spacing: -0.01em;
+  font-size: clamp(2.6rem, 6.4vw, 4.6rem); line-height: 1; margin-bottom: 0.2rem;
+  min-height: 1.1em; /* holds its place while the typewriter is still empty on load */
+  color: var(--hero-text);
+  /* A colored offset shadow (brand green) instead of a plain dark one —
+     reads as dimensional without needing a gradient fill, and ties the
+     accent color into the headline itself. */
+  text-shadow:
+    1px 1px 0 rgba(var(--hero-accent-rgb), 0.55),
+    2px 2px 0 rgba(var(--hero-accent-rgb), 0.4),
+    3px 3px 0 rgba(var(--hero-accent-rgb), 0.28),
+    5px 6px 14px rgba(28, 23, 18, 0.18);
+}
+/* Sized relative to em so it scales with whichever element it's dropped
+   into — currently #hero-title, previously .hero-greeting. */
+.typewriter-cursor {
+  display: inline-block; overflow: hidden; width: 0.05em; height: 0.85em; margin-left: 0.06em;
+  background: var(--hero-accent); vertical-align: -0.05em; border-radius: 1px;
+  animation: blink 0.9s step-end infinite;
+}
+.hero-sub { color: var(--hero-text-dim); font-size: 1.1rem; max-width: 480px; margin-bottom: 2rem; }
+.hero-actions { display: flex; gap: 1rem; margin-bottom: 0; flex-wrap: wrap; }
+.scroll-cue {
+  /* Cleared above the marquee, which now sits at the very bottom of the hero. */
+  position: absolute; bottom: 5.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  color: var(--hero-text-faint); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  z-index: 3;
+}
+.scroll-cue span { width: 1px; height: 32px; background: linear-gradient(var(--hero-accent), transparent); animation: scrollcue 1.8s ease-in-out infinite; }
+@keyframes scrollcue { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+/* Portrait, framed — the hero's main visual now, not the WebGL scene it
+   replaced. A true seamless cutout-into-background blend (like the Dribbble
+   reference) needs the subject's background actually removed, which isn't
+   something a plain <img> crop can do — framed it cleanly instead rather
+   than fake a cutout with a hard edge. */
+.hero-photo-wrap {
+  position: relative; z-index: 1; justify-self: end; align-self: center;
+  width: min(520px, 100%); aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden;
+  background: var(--bg-elev-2); /* shows through instead of a broken-image glyph if the file's ever missing */
+  box-shadow: 0 30px 70px -24px rgba(28, 23, 18, 0.3), 0 0 0 1px var(--line);
+}
+.hero-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ==========================================================================
+   About
+   ========================================================================== */
+.about-grid { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 3rem; align-items: start; }
+.about-summary {
+  color: var(--text); font-family: var(--font-accent); font-style: italic; font-weight: 500;
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem); line-height: 1.5; margin-bottom: 2rem;
+}
+.about-achievements li {
+  position: relative; padding-left: 1.6rem; margin-bottom: 0.9rem; color: var(--text);
+}
+.about-achievements li::before {
+  content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700;
+}
+
+/* Highlight tiles — replaced a single long resume-style paragraph with a
+   short pull-quote (.about-summary above) plus these scannable cards. */
+.about-highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+.highlight-card {
+  position: relative; background: var(--bg-elev); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 1.4rem;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.highlight-card:hover {
+  transform: translateY(-4px); border-color: rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 16px 34px -18px rgba(var(--accent-rgb), 0.35);
+}
+.highlight-icon { font-size: 1.4rem; display: block; margin-bottom: 0.6rem; }
+.highlight-card h3 { font-size: 0.98rem; margin-bottom: 0.35rem; }
+.highlight-card p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.45; }
+/* Stats + quick facts — both now card "blocks" matching the About
+   highlight-cards, instead of the old plain divider-line rows. */
+.stat-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1.1rem; margin-top: 3.5rem;
+}
+.stat {
+  background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.stat:hover {
+  transform: translateY(-4px); border-color: rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 16px 34px -18px rgba(var(--accent-rgb), 0.35);
+}
+.stat-row .stat-value {
+  font-family: var(--font-head); font-weight: 700; font-size: 2.1rem;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 170%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4), 2px 2px 0 rgba(0,0,0,0.3), 3px 3px 5px rgba(0,0,0,0.35);
+}
+.stat-row .stat-label { color: var(--text-dim); font-size: 0.85rem; margin-top: 0.3rem; }
+
+/* ==========================================================================
+   Experience timeline
+   ========================================================================== */
+.timeline { position: relative; padding-left: 2rem; border-left: 1px solid var(--line); }
+.timeline-item { position: relative; padding-bottom: 3rem; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {
+  content: ''; position: absolute; left: -2.4rem; top: 0.3rem;
+  width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.timeline-item .role { font-family: var(--font-head); font-size: 1.2rem; }
+.timeline-item .meta { color: var(--text-dim); font-family: var(--font-mono); font-size: 0.8rem; margin: 0.3rem 0 1rem; }
+.timeline-item ul li { position: relative; padding-left: 1.2rem; color: var(--text-dim); margin-bottom: 0.5rem; font-size: 0.95rem; }
+.timeline-item ul li::before { content: '—'; position: absolute; left: 0; color: var(--text-faint); }
+
+/* ==========================================================================
+   Projects
+   ========================================================================== */
+/* Single column, one project per row — not a multi-up grid — so each real
+   screenshot gets shown big, the way a portfolio case-study list usually
+   reads (per user request: "single single project" in a landscape frame). */
+.project-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+.project-card {
+  position: relative;
+  background: linear-gradient(180deg, var(--bg-elev-2), var(--bg-elev));
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 2rem; display: flex; flex-direction: column; gap: 1rem;
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.project-card::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.project-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(var(--accent-rgb),0.35);
+  box-shadow: 0 20px 45px -20px rgba(var(--accent-rgb), 0.35);
+}
+.project-card:hover::before { opacity: 1; }
+/* Landscape "browser mockup" frame for a project's real screenshot — the
+   source images vary wildly in aspect ratio (a wide analytics dashboard vs.
+   a homepage screenshot), so this uses object-fit:contain on a neutral fill
+   rather than :cover, which was cropping a large chunk off the sides of
+   every wide screenshot. Now that each project is its own full-width row
+   (not a multi-up grid), a wide 16:9 landscape frame reads properly at that
+   larger size instead of looking like a cramped card thumbnail. */
+.project-thumb-wrap {
+  width: calc(100% + 4rem); margin: -2rem -2rem 0;
+  aspect-ratio: 16 / 9; background: var(--bg-elev-2);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.project-thumb { width: 100%; height: 100%; object-fit: contain; display: block; }
+.project-meta { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; }
+.project-card h3 { font-size: 1.15rem; }
+.project-card p { color: var(--text-dim); font-size: 0.92rem; }
+.project-card ul li { color: var(--text-dim); font-size: 0.88rem; padding-left: 1.1rem; position: relative; margin-bottom: 0.4rem; }
+.project-card ul li::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+.project-link { margin-top: auto; color: var(--accent); font-size: 0.88rem; font-weight: 600; }
+.project-link:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   Skills
+   ========================================================================== */
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+.skill-card { background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; }
+.skill-card h3 { font-size: 1rem; color: var(--accent); margin-bottom: 1rem; }
+.skill-card .pill-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pill { border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.85rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); }
+
+/* ==========================================================================
+   Contact
+   ========================================================================== */
+.contact-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 3rem; }
+.contact-links { display: flex; flex-direction: column; gap: 1rem; }
+.contact-link {
+  display: flex; align-items: center; gap: 0.8rem; padding: 1rem 1.2rem;
+  background: var(--bg-elev); border: 1px solid var(--line); border-radius: 14px;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.contact-link-label { flex: 1; }
+.contact-link-arrow {
+  font-family: var(--font-mono); color: var(--accent); opacity: 0; transform: translate(-4px, 4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.contact-link:hover { border-color: var(--accent); transform: translateX(4px); }
+.contact-link:hover .contact-link-arrow { opacity: 1; transform: translate(0, 0); }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.contact-form input, .contact-form textarea {
+  width: 100%; background: var(--bg-elev); border: 1px solid var(--line); border-radius: 12px;
+  padding: 0.9rem 1.1rem; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; resize: vertical;
+}
+.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); }
+.form-note { color: var(--text-faint); font-size: 0.78rem; }
+
+#site-footer { text-align: center; padding: 2.5rem 1.5rem; color: var(--text-faint); font-size: 0.85rem; border-top: 1px solid var(--line); }
+
+/* ==========================================================================
+   Chat bubble — deliberately NOT a boxed "chat app" widget. It's a speech
+   bubble that hangs above the avatar and speaks first, with a sharp corner
+   pointing down at the character instead of a generic header bar.
+   ========================================================================== */
+.chat-panel {
+  position: fixed; z-index: 55; bottom: 10.5rem; right: 1.75rem;
+  width: 340px; max-width: calc(100vw - 2rem); max-height: calc(100vh - 13rem);
+  background: linear-gradient(165deg, var(--bg-elev-2), var(--bg-elev));
+  border: 1px solid var(--line);
+  border-radius: 22px 22px 6px 22px; /* the sharp corner reads as a tail toward the avatar */
+  display: flex; flex-direction: column; overflow: hidden;
+  padding: 1.1rem 1.1rem 0.9rem;
+  gap: 0.7rem;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(var(--accent-rgb),0.1);
+  opacity: 0; transform: translateY(14px) scale(0.94); transform-origin: bottom right;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.chat-panel.open { opacity: 1; transform: none; }
+.chat-close {
+  position: absolute; top: 0.7rem; right: 0.8rem;
+  background: none; border: none; color: var(--text-faint); font-size: 0.9rem;
+  width: 26px; height: 26px; border-radius: 50%;
+}
+.chat-close:hover { background: var(--bg-elev-2); color: var(--text); }
+.chat-nametag {
+  display: flex; align-items: center; gap: 0.45rem;
+  font-family: var(--font-head); font-weight: 600; font-size: 0.85rem;
+  color: var(--accent); letter-spacing: 0.02em;
+}
+.chat-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); animation: pulse-dot 2s ease-in-out infinite; }
+.chat-dot.offline { background: var(--text-faint); box-shadow: none; animation: none; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; min-height: 60px; }
+.chat-msg { max-width: 92%; font-size: 0.92rem; line-height: 1.5; }
+.chat-msg.assistant { align-self: flex-start; color: var(--text); }
+.chat-msg.user {
+  align-self: flex-end; background: var(--accent); color: #06110d;
+  padding: 0.55rem 0.85rem; border-radius: 14px 14px 4px 14px; font-size: 0.88rem;
+}
+.chat-msg.error { align-self: flex-start; color: #ff9d9d; font-size: 0.85rem; }
+.chat-msg .cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); margin-left: 2px; vertical-align: -0.15em; animation: blink 0.9s step-end infinite; }
+.chat-suggestions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.8rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); background: none; }
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chat-form { display: flex; gap: 0.6rem; padding-top: 0.7rem; border-top: 1px solid var(--line); }
+.chat-form input { flex: 1; background: var(--bg-elev-2); border: 1px solid var(--line); border-radius: 999px; padding: 0.7rem 1.1rem; color: var(--text); font-size: 0.88rem; }
+.chat-form input:focus { outline: none; border-color: var(--accent); }
+.chat-form button { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--accent); color: #06110d; font-size: 1rem; flex-shrink: 0; }
+.typing-dots span { display: inline-block; width: 5px; height: 5px; background: var(--text-dim); border-radius: 50%; margin-right: 3px; animation: blink-dot 1.2s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink-dot { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
+@keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+/* ==========================================================================
+   Reveal animation hook (GSAP toggles .in-view)
+   ========================================================================== */
+[data-reveal] { opacity: 0; transform: translateY(24px); }
+[data-reveal].in-view { opacity: 1; transform: translateY(0); transition: opacity 0.8s ease, transform 0.8s ease; }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 900px) {
+  .about-grid, .contact-grid { grid-template-columns: 1fr; }
+  #site-nav {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; gap: 0; margin: 0; padding: 0.5rem 0;
+    background: var(--bg-elev); border-bottom: 1px solid var(--line);
+  }
+  #site-nav.open { display: flex; }
+  #site-nav a { padding: 0.9rem 1.5rem; border-top: 1px solid var(--line); }
+  #site-nav a:first-child { border-top: none; }
+  #nav-toggle { display: flex; }
+  .header-cta { display: none; }
+  #hero { grid-template-columns: 1fr; padding: 7rem 1.2rem 7rem; text-align: left; row-gap: 2.5rem; }
+  .hero-photo-wrap { justify-self: center; width: min(340px, 100%); order: -1; }
+  /* #character-stage geometry is sized/positioned in JS (src/three/dock.js),
+     which already reads window.innerWidth, so it's responsive without media
+     queries here. */
+}
+
+@media (max-width: 480px) {
+  section { padding: 5rem 1.2rem; }
+  .chat-panel { right: 0.75rem; left: 0.75rem; width: auto; bottom: 7.5rem; max-height: calc(100vh - 9rem); }
+  .about-highlights { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { transition: none !important; transform: none !important; }
+  .scroll-cue span { animation: none; }
+  .marquee-track { animation: none; }
+  .chat-dot { animation: none; }
+  #cursor-dot, #cursor-ring { display: none; }
+}
