@@ -3,8 +3,7 @@ import { persona } from '../content.js';
 
 const MAX_SENT_HISTORY = 12;
 
-const GREETING =
-  "Hey, I'm an AI version of Usman — ask me anything, including what a normal day looks like for him.";
+const GREETING = "Hey, I'm an AI version of Usman — ask me anything, including what a normal day looks like for him.";
 
 export function initChat({ character, dockTrigger }) {
   const panel = document.getElementById('chat-panel');
@@ -15,86 +14,12 @@ export function initChat({ character, dockTrigger }) {
   const closeBtn = document.getElementById('chat-close');
   const dotEl = document.getElementById('chat-dot');
 
-  if (!panel || !messagesEl || !form || !input) {
-    console.error('Chatbot elements not found');
-    return { open() {}, close() {} };
-  }
-
   const history = [];
   let hasOpenedBefore = false;
   let hasSentMessage = false;
   let isSending = false;
 
-  // ===================================
-  // CHAT WINDOW SIZE + SCROLL FIX
-  // ===================================
-
-  if (!document.getElementById('chat-layout-fix')) {
-    const style = document.createElement('style');
-    style.id = 'chat-layout-fix';
-
-    style.textContent = `
-      #chat-panel {
-        display: flex !important;
-        flex-direction: column !important;
-        height: min(540px, calc(100dvh - 120px)) !important;
-        max-height: calc(100dvh - 120px) !important;
-        overflow: hidden !important;
-        box-sizing: border-box !important;
-      }
-
-      #chat-panel[hidden] {
-        display: none !important;
-      }
-
-      #chat-messages {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        height: auto !important;
-        max-height: none !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        overscroll-behavior: contain;
-        overflow-wrap: anywhere;
-        scroll-behavior: auto;
-      }
-
-      #chat-suggestions {
-        flex-shrink: 0 !important;
-        max-height: 160px;
-        overflow-y: auto;
-      }
-
-      #chat-suggestions[hidden] {
-        display: none !important;
-      }
-
-      #chat-form {
-        flex-shrink: 0 !important;
-      }
-
-      #chat-messages .chat-msg {
-        height: auto;
-        flex-shrink: 0;
-        overflow-wrap: anywhere;
-      }
-
-      @media (max-width: 600px) {
-        #chat-panel {
-          height: min(520px, calc(100dvh - 110px)) !important;
-          max-height: calc(100dvh - 110px) !important;
-          max-width: calc(100vw - 20px) !important;
-        }
-      }
-    `;
-
-    document.head.appendChild(style);
-  }
-
-  // ===================================
-  // AUTO SCROLL TO LATEST MESSAGE
-  // ===================================
-
+  // Scroll to latest message without changing any CSS
   function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
@@ -103,21 +28,12 @@ export function initChat({ character, dockTrigger }) {
     });
   }
 
-  // ===================================
-  // ONLINE STATUS
-  // ===================================
-
   function setOnline(online) {
     dotEl?.classList.toggle('offline', !online);
   }
 
-  // ===================================
-  // ADD NORMAL MESSAGE
-  // ===================================
-
   function appendStatic(role, text) {
     const div = document.createElement('div');
-
     div.className = `chat-msg ${role}`;
     div.textContent = text;
 
@@ -127,13 +43,8 @@ export function initChat({ character, dockTrigger }) {
     return div;
   }
 
-  // ===================================
-  // TYPING DOTS
-  // ===================================
-
   function appendTyping() {
     const div = document.createElement('div');
-
     div.className = 'chat-msg assistant typing-dots';
     div.innerHTML = '<span></span><span></span><span></span>';
 
@@ -143,10 +54,7 @@ export function initChat({ character, dockTrigger }) {
     return div;
   }
 
-  // ===================================
-  // ANIMATED AI TEXT
-  // ===================================
-
+  // Original typing animation preserved
   function typeInto(el, text) {
     return new Promise((resolve) => {
       const delay = Math.max(
@@ -165,7 +73,7 @@ export function initChat({ character, dockTrigger }) {
         el.textContent = text.slice(0, i);
         el.appendChild(cursor);
 
-        // Keep latest AI text visible
+        // Automatically follow AI response
         scrollToBottom();
 
         if (i >= text.length) {
@@ -178,17 +86,12 @@ export function initChat({ character, dockTrigger }) {
     });
   }
 
-  // ===================================
-  // AI SPEAKING ANIMATION
-  // ===================================
-
+  // Original avatar speaking functionality
   async function appendSpoken(text) {
     const div = document.createElement('div');
-
     div.className = 'chat-msg assistant';
-    messagesEl.appendChild(div);
 
-    scrollToBottom();
+    messagesEl.appendChild(div);
 
     character?.startTalking?.();
 
@@ -203,30 +106,24 @@ export function initChat({ character, dockTrigger }) {
     return div;
   }
 
-  // ===================================
-  // HIDE SUGGESTED QUESTIONS
-  // ===================================
-
+  // FIX 1: Hide questions after first message
   function hideSuggestions() {
     hasSentMessage = true;
 
     if (suggestionsEl) {
       suggestionsEl.innerHTML = '';
-      suggestionsEl.hidden = true;
+      suggestionsEl.style.display = 'none';
     }
 
     scrollToBottom();
   }
 
-  // ===================================
-  // SHOW SUGGESTIONS FIRST TIME ONLY
-  // ===================================
-
+  // Original suggested questions design preserved
   function renderSuggestions() {
     if (!suggestionsEl || hasSentMessage) return;
 
     suggestionsEl.innerHTML = '';
-    suggestionsEl.hidden = false;
+    suggestionsEl.style.removeProperty('display');
 
     persona.suggestedQuestions.forEach((q) => {
       const chip = document.createElement('button');
@@ -235,31 +132,23 @@ export function initChat({ character, dockTrigger }) {
       chip.type = 'button';
       chip.textContent = q;
 
-      chip.addEventListener('click', () => {
-        submitMessage(q);
-      });
+      chip.addEventListener('click', () => submitMessage(q));
 
       suggestionsEl.appendChild(chip);
     });
-
-    scrollToBottom();
   }
 
-  // ===================================
-  // SEND MESSAGE TO GROQ API
-  // ===================================
-
+  // Send user messages to existing API
   async function submitMessage(text) {
-    const clean = text?.trim();
+    const clean = text.trim();
 
     if (!clean || isSending) return;
 
     isSending = true;
 
-    // Remove suggestions after first message
+    // Hide initial questions and free their space
     hideSuggestions();
 
-    // Show user's message
     appendStatic('user', clean);
 
     history.push({
@@ -270,10 +159,9 @@ export function initChat({ character, dockTrigger }) {
     input.value = '';
     input.disabled = true;
 
-    scrollToBottom();
-
-    // Show typing animation
     const typingEl = appendTyping();
+
+    scrollToBottom();
 
     try {
       const res = await fetch('/api/chat', {
@@ -298,26 +186,25 @@ export function initChat({ character, dockTrigger }) {
 
       if (!res.ok || !data?.reply) {
         const fallback =
-          "Chat isn't reachable right now — check the /api/chat function and GROQ_API_KEY.";
+          "Chat isn't reachable right now — this needs the /api/chat serverless function running (use `vercel dev` locally, or it just works once deployed to Vercel with GROQ_API_KEY set).";
 
         appendStatic('error', data?.error || fallback);
         setOnline(false);
         return;
       }
 
-      // Save AI response
       history.push({
         role: 'assistant',
         content: data.reply
       });
 
-      // Display animated response
+      // AI reply with original typing and avatar animation
       await appendSpoken(data.reply);
 
       setOnline(true);
       scrollToBottom();
 
-    } catch (error) {
+    } catch {
       typingEl.remove();
 
       appendStatic(
@@ -331,15 +218,11 @@ export function initChat({ character, dockTrigger }) {
       isSending = false;
       input.disabled = false;
       input.focus();
-
       scrollToBottom();
     }
   }
 
-  // ===================================
-  // OPEN CHATBOT
-  // ===================================
-
+  // Original chat opening behavior
   function openChat() {
     panel.hidden = false;
 
@@ -359,22 +242,15 @@ export function initChat({ character, dockTrigger }) {
     }
 
     input.focus();
-    scrollToBottom();
   }
 
-  // ===================================
-  // CLOSE CHATBOT
-  // ===================================
-
+  // Original close behavior
   function closeChat() {
     panel.classList.remove('open');
     panel.hidden = true;
   }
 
-  // ===================================
-  // AVATAR BUTTON
-  // ===================================
-
+  // Character avatar trigger
   dockTrigger?.addEventListener('click', () => {
     if (panel.hidden) {
       openChat();
@@ -383,16 +259,10 @@ export function initChat({ character, dockTrigger }) {
     }
   });
 
-  // ===================================
-  // CLOSE BUTTON
-  // ===================================
+  // Close button
+  closeBtn.addEventListener('click', closeChat);
 
-  closeBtn?.addEventListener('click', closeChat);
-
-  // ===================================
-  // FORM SUBMIT
-  // ===================================
-
+  // Message submit
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     submitMessage(input.value);
