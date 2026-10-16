@@ -14,7 +14,7 @@ export const person = {
   whatsapp: 'https://wa.me/923093954103',
   email: 'usmansabir117@gmail.com',
   // TODO: confirm the real LinkedIn profile URL — resume only gave the name.
-  linkedin: 'https://www.linkedin.com/in/usman-sabir',
+  linkedin: 'www.linkedin.com/in/usman-sabir-421045402',
   // Confirmed by Usman as his own seller account (display name differs from
   // his real name, which he said is intentional/how the account is set up).
   fiverr: 'https://www.fiverr.com/akhlaqqureshi',
